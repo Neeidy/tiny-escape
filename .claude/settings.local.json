@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "WebSearch",
+      "WebFetch(domain:www.awwwards.com)",
+      "WebFetch(domain:mediaboom.com)",
+      "WebFetch(domain:www.undercanvas.com)",
+      "WebFetch(domain:getaway.house)",
+      "WebFetch(domain:postcardcabins.com)",
+      "WebFetch(domain:kiphideaways.com)"
     ]
   }
 }
