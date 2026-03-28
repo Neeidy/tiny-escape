@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyEscape — Doğayla Baş Başa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green-dark:  #1a2e1a;
+            --green:       #2d4a2d;
+            --green-mid:   #3d6b3d;
+            --green-light: #5a8a5a;
+            --cream:       #f5f0e8;
+            --cream-dark:  #ede5d4;
+            --gold:        #c9a84c;
+            --gold-light:  #e8c97a;
+            --gold-pale:   #f7efc8;
+            --text-dark:   #1a1a1a;
+            --text-mid:    #4a4a3a;
+            --text-light:  #7a7a6a;
+            --white:       #ffffff;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; }
+
+        img { display: block; width: 100%; object-fit: cover; }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--cream-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+        /* ── NAVBAR ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 5%;
+            height: 72px;
+            transition: all .4s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(26,46,26,0.97);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 30px rgba(0,0,0,0.3);
+        }
+
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+            text-decoration: none;
+        }
+
+        .nav-logo span { color: var(--cream); font-style: italic; }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+
+        .nav-links a {
+            color: rgba(245,240,232,0.8);
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color .3s;
+        }
+
+        .nav-links a:hover { color: var(--gold-light); }
+
+        .nav-cta {
+            padding: .55rem 1.4rem;
+            background: var(--gold);
+            color: var(--green-dark) !important;
+            border-radius: 4px;
+            font-weight: 600 !important;
+        }
+
+        .nav-cta:hover { background: var(--gold-light) !important; color: var(--green-dark) !important; }
+
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .hamburger span { width: 22px; height: 1.5px; background: var(--cream); transition: .3s; }
+
+        /* ── HERO ── */
+        #hero {
+            position: relative;
+            height: 100vh;
+            min-height: 700px;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute; inset: 0;
+            background-image: url('https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1920&q=90');
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.05);
+            transition: transform 8s ease;
+        }
+
+        .hero-bg.loaded { transform: scale(1); }
+
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom,
+                rgba(10,20,10,0.5) 0%,
+                rgba(10,20,10,0.35) 50%,
+                rgba(10,20,10,0.7) 100%);
+        }
+
+        .hero-content {
+            position: relative; z-index: 2;
+            max-width: 800px; padding: 0 2rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: .4rem 1.2rem;
+            border: 1px solid var(--gold);
+            color: var(--gold-light);
+            font-size: .72rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: fadeUp .8s .3s forwards;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 6.5rem);
+            font-weight: 300;
+            color: var(--white);
+            line-height: 1.05;
+            margin-bottom: 1.2rem;
+            opacity: 0;
+            animation: fadeUp .8s .5s forwards;
+        }
+
+        .hero-title em {
+            font-style: italic;
+            color: var(--gold-light);
+        }
+
+        .hero-sub {
+            font-size: 1rem;
+            color: rgba(245,240,232,0.75);
+            letter-spacing: .5px;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeUp .8s .7s forwards;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            padding: 1rem 2.8rem;
+            background: var(--gold);
+            color: var(--green-dark);
+            text-decoration: none;
+            font-size: .85rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 3px;
+            transition: all .3s;
+            opacity: 0;
+            animation: fadeUp .8s .9s forwards;
+        }
+
+        .hero-btn:hover {
+            background: var(--gold-light);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(201,168,76,0.35);
+        }
+
+        .hero-scroll {
+            position: absolute; bottom: 2.5rem; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: .6rem;
+            color: rgba(245,240,232,0.5);
+            font-size: .65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: scrollBounce 2.5s infinite 1.5s;
+        }
+
+        .hero-scroll::after {
+            content: '';
+            width: 1px; height: 50px;
+            background: linear-gradient(to bottom, rgba(201,168,76,0.8), transparent);
+        }
+
+        /* ── SECTION COMMON ── */
+        .section-header { text-align: center; margin-bottom: 4rem; }
+
+        .section-tag {
+            font-size: .72rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: .75rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 400;
+            color: var(--green-dark);
+            line-height: 1.15;
+        }
+
+        .section-title em { font-style: italic; color: var(--green-mid); }
+
+        .section-rule {
+            width: 40px; height: 1px;
+            background: var(--gold);
+            margin: 1.2rem auto 0;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+
+        /* ── INTRO STRIP ── */
+        #intro {
+            background: var(--green-dark);
+            padding: 4rem 5%;
+        }
+
+        .intro-grid {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 3rem; text-align: center;
+        }
+
+        .intro-item { color: var(--cream); }
+
+        .intro-icon {
+            font-size: 2rem; margin-bottom: .8rem;
+        }
+
+        .intro-item h3 {
+            font-size: 1.1rem; font-weight: 500;
+            color: var(--gold-light);
+            margin-bottom: .4rem;
+        }
+
+        .intro-item p {
+            font-size: .85rem;
+            color: rgba(245,240,232,0.6);
+            line-height: 1.7;
+        }
+
+        /* ── HOUSES ── */
+        #houses { padding: 8rem 0; background: var(--cream); }
+
+        .house-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            margin-bottom: 6rem;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.1);
+        }
+
+        .house-block:last-child { margin-bottom: 0; }
+        .house-block.reverse { direction: rtl; }
+        .house-block.reverse > * { direction: ltr; }
+
+        /* Gallery */
+        .house-gallery { position: relative; overflow: hidden; }
+
+        .gallery-main {
+            position: relative;
+            height: 500px;
+            overflow: hidden;
+        }
+
+        .gallery-main img {
+            height: 100%;
+            object-fit: cover;
+            transition: transform .6s ease;
+        }
+
+        .house-gallery:hover .gallery-main img { transform: scale(1.03); }
+
+        .gallery-thumbs {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 3px;
+            background: var(--green-dark);
+            padding: 3px;
+        }
+
+        .gallery-thumbs img {
+            height: 90px;
+            cursor: pointer;
+            transition: opacity .3s;
+        }
+
+        .gallery-thumbs img:hover { opacity: .75; }
+
+        .gallery-badge {
+            position: absolute; top: 1.5rem; left: 1.5rem;
+            background: var(--gold);
+            color: var(--green-dark);
+            padding: .3rem .9rem;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 2px;
+        }
+
+        /* House info */
+        .house-info {
+            background: var(--white);
+            padding: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .house-tag {
+            font-size: .7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: .6rem;
+        }
+
+        .house-name {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 400;
+            color: var(--green-dark);
+            margin-bottom: .4rem;
+        }
+
+        .house-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-style: italic;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .house-rule { width: 32px; height: 1px; background: var(--gold); margin-bottom: 1.5rem; }
+
+        .house-desc {
+            font-size: .9rem;
+            color: var(--text-mid);
+            line-height: 1.9;
+            margin-bottom: 2rem;
+        }
+
+        .house-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .6rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            display: flex; align-items: center; gap: .6rem;
+            font-size: .82rem;
+            color: var(--text-mid);
+        }
+
+        .feature::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .house-price-row {
+            display: flex; align-items: center; justify-content: space-between;
+            border-top: 1px solid var(--cream-dark);
+            padding-top: 1.5rem;
+        }
+
+        .house-price { font-family: 'Cormorant Garamond', serif; }
+        .house-price span { font-size: 2.2rem; font-weight: 600; color: var(--green-dark); }
+        .house-price small { font-size: .8rem; color: var(--text-light); }
+
+        .book-btn {
+            padding: .8rem 2rem;
+            background: var(--green-dark);
+            color: var(--gold-light);
+            text-decoration: none;
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 3px;
+            transition: all .3s;
+            border: 1px solid var(--green-dark);
+        }
+
+        .book-btn:hover {
+            background: transparent;
+            color: var(--green-dark);
+            border-color: var(--green-dark);
+        }
+
+        /* ── POOL & COMMON ── */
+        #common { padding: 8rem 0; background: var(--green-dark); }
+
+        #common .section-title { color: var(--cream); }
+        #common .section-title em { color: var(--gold-light); }
+        #common .section-rule { background: var(--gold); }
+        #common .section-tag { color: var(--gold); }
+
+        .common-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 2px;
+            margin-bottom: 2px;
+        }
+
+        .common-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2px;
+        }
+
+        .common-img-wrap { overflow: hidden; position: relative; }
+        .common-img-wrap img { height: 100%; transition: transform .6s ease; }
+        .common-img-wrap:hover img { transform: scale(1.04); }
+
+        .common-grid .common-img-wrap:first-child img { height: 420px; }
+        .common-grid .common-img-wrap:last-child img { height: 420px; }
+        .common-bottom .common-img-wrap img { height: 250px; }
+
+        .common-text-card {
+            background: var(--cream);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .common-text-card h3 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--green-dark);
+            margin-bottom: .6rem;
+        }
+
+        .common-text-card p {
+            font-size: .88rem;
+            color: var(--text-mid);
+            line-height: 1.9;
+        }
+
+        .amenity-list {
+            list-style: none;
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+        }
+
+        .amenity-list li {
+            font-size: .85rem;
+            color: var(--text-mid);
+            display: flex; align-items: center; gap: .7rem;
+        }
+
+        .amenity-list li::before {
+            content: '◆';
+            font-size: .45rem;
+            color: var(--gold);
+        }
+
+        /* ── PRICING ── */
+        #pricing { padding: 8rem 0; background: var(--cream-dark); }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 1.5rem;
+            margin-top: 3.5rem;
+        }
+
+        .price-card {
+            background: var(--white);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+            transition: all .35s;
+        }
+
+        .price-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+        }
+
+        .price-card.featured {
+            background: var(--green-dark);
+            transform: scale(1.03);
+        }
+
+        .price-card.featured:hover { transform: scale(1.03) translateY(-8px); }
+
+        .price-header {
+            padding: 2.5rem 2rem 1.5rem;
+            border-bottom: 1px solid var(--cream-dark);
+            text-align: center;
+        }
+
+        .price-card.featured .price-header { border-bottom-color: rgba(255,255,255,0.1); }
+
+        .price-plan {
+            font-size: .7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: .5rem;
+        }
+
+        .price-name {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--green-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .price-card.featured .price-name { color: var(--cream); }
+
+        .price-amount { font-family: 'Cormorant Garamond', serif; }
+        .price-amount .currency { font-size: 1.2rem; color: var(--gold); vertical-align: top; margin-top: .5rem; display: inline-block; }
+        .price-amount .number { font-size: 3.5rem; font-weight: 600; color: var(--green-dark); line-height: 1; }
+        .price-card.featured .price-amount .number { color: var(--cream); }
+        .price-amount .per { font-size: .8rem; color: var(--text-light); }
+        .price-card.featured .price-amount .per { color: rgba(245,240,232,.6); }
+
+        .price-body { padding: 2rem; }
+
+        .price-features { list-style: none; display: flex; flex-direction: column; gap: .85rem; margin-bottom: 2rem; }
+
+        .price-features li {
+            font-size: .84rem;
+            color: var(--text-mid);
+            display: flex; align-items: center; gap: .7rem;
+        }
+
+        .price-card.featured .price-features li { color: rgba(245,240,232,.75); }
+
+        .price-features li span {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: rgba(201,168,76,0.15);
+            color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: .65rem;
+            flex-shrink: 0;
+        }
+
+        .price-cta {
+            display: block; width: 100%;
+            padding: .9rem;
+            text-align: center;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 3px;
+            transition: all .3s;
+            border: 1px solid var(--green-dark);
+            color: var(--green-dark);
+            background: transparent;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .price-cta:hover { background: var(--green-dark); color: var(--gold-light); }
+
+        .price-card.featured .price-cta {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: var(--green-dark);
+        }
+
+        .price-card.featured .price-cta:hover {
+            background: var(--gold-light);
+            border-color: var(--gold-light);
+        }
+
+        .price-badge {
+            display: inline-block;
+            padding: .25rem .8rem;
+            background: var(--gold);
+            color: var(--green-dark);
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 20px;
+            margin-bottom: .8rem;
+        }
+
+        /* ── RESERVATION ── */
+        #reservation { padding: 8rem 0; background: var(--cream); }
+
+        .res-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 6rem;
+            align-items: start;
+        }
+
+        .res-info h2 {
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 400;
+            color: var(--green-dark);
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+
+        .res-info p {
+            font-size: .88rem;
+            color: var(--text-mid);
+            line-height: 1.9;
+            margin-bottom: 2rem;
+        }
+
+        .res-contact-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+
+        .res-contact-list li {
+            display: flex; align-items: center; gap: 1rem;
+            font-size: .85rem; color: var(--text-mid);
+        }
+
+        .res-contact-list .icon {
+            width: 36px; height: 36px;
+            background: var(--gold-pale);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .9rem;
+            flex-shrink: 0;
+        }
+
+        .res-form {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 4px;
+            box-shadow: 0 10px 60px rgba(0,0,0,0.07);
+        }
+
+        .res-form h3 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--green-dark);
+            margin-bottom: 2rem;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .form-group { margin-bottom: 1.2rem; }
+
+        .form-group label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: .5rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: .85rem 1rem;
+            border: 1px solid var(--cream-dark);
+            border-radius: 3px;
+            background: var(--cream);
+            color: var(--text-dark);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .88rem;
+            transition: all .25s;
+            outline: none;
+            appearance: none;
+        }
+
+        .form-group select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a6a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--gold);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+        }
+
+        .form-group textarea { resize: vertical; }
+
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--green-dark);
+            color: var(--gold-light);
+            border: none;
+            border-radius: 3px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all .3s;
+            margin-top: .5rem;
+        }
+
+        .form-submit:hover {
+            background: var(--green-mid);
+            box-shadow: 0 8px 30px rgba(26,46,26,0.3);
+        }
+
+        /* ── CONTACT & MAP ── */
+        #contact { padding: 8rem 0; background: var(--cream-dark); }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-info h2 {
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            font-weight: 400;
+            color: var(--green-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info p {
+            font-size: .88rem;
+            color: var(--text-mid);
+            line-height: 1.9;
+            margin-bottom: 2rem;
+        }
+
+        .contact-cards { display: flex; flex-direction: column; gap: 1rem; }
+
+        .contact-card {
+            background: var(--white);
+            padding: 1.2rem 1.5rem;
+            border-radius: 4px;
+            display: flex; align-items: center; gap: 1rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        }
+
+        .contact-card-icon {
+            width: 42px; height: 42px;
+            background: var(--gold-pale);
+            border-radius: 3px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .contact-card-text strong {
+            display: block;
+            font-size: .78rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: .2rem;
+        }
+
+        .contact-card-text span {
+            font-size: .88rem;
+            color: var(--text-dark);
+        }
+
+        .map-placeholder {
+            background: var(--green-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            height: 400px;
+            position: relative;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.15);
+        }
+
+        .map-placeholder img {
+            height: 100%;
+            object-fit: cover;
+            opacity: .7;
+        }
+
+        .map-pin {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .map-pin-dot {
+            width: 20px; height: 20px;
+            background: var(--gold);
+            border-radius: 50%;
+            margin: 0 auto .5rem;
+            box-shadow: 0 0 0 6px rgba(201,168,76,0.3);
+            animation: pinPulse 2s infinite;
+        }
+
+        .map-pin-label {
+            background: var(--white);
+            padding: .4rem .8rem;
+            border-radius: 3px;
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--green-dark);
+            white-space: nowrap;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--green-dark);
+            color: var(--cream);
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 3rem;
+            max-width: 1200px; margin: 0 auto;
+            padding: 5rem 5% 4rem;
+        }
+
+        .footer-brand .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            color: var(--gold-light);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .footer-brand p {
+            font-size: .82rem;
+            color: rgba(245,240,232,.5);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-socials { display: flex; gap: .7rem; }
+
+        .soc-btn {
+            width: 34px; height: 34px;
+            border: 1px solid rgba(245,240,232,.15);
+            border-radius: 3px;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(245,240,232,.5);
+            text-decoration: none;
+            font-size: .75rem;
+            font-weight: 700;
+            transition: all .25s;
+        }
+
+        .soc-btn:hover { border-color: var(--gold); color: var(--gold-light); }
+
+        .footer-col h4 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+
+        .footer-col ul li a {
+            color: rgba(245,240,232,.5);
+            text-decoration: none;
+            font-size: .84rem;
+            transition: color .25s;
+        }
+
+        .footer-col ul li a:hover { color: var(--gold-light); }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(245,240,232,.08);
+            max-width: 1200px; margin: 0 auto;
+            padding: 1.5rem 5%;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .footer-bottom p {
+            font-size: .78rem;
+            color: rgba(245,240,232,.35);
+        }
+
+        /* ── TOAST ── */
+        .toast {
+            position: fixed; bottom: 2rem; right: 2rem;
+            background: var(--green-dark);
+            border: 1px solid var(--gold);
+            border-radius: 4px;
+            padding: 1rem 1.5rem;
+            color: var(--gold-light);
+            font-size: .85rem;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transform: translateY(120%);
+            transition: transform .4s cubic-bezier(.4,0,.2,1);
+            z-index: 999;
+        }
+
+        .toast.show { transform: translateY(0); }
+
+        /* ── REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity .8s ease, transform .8s ease;
+        }
+
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50%       { transform: translateX(-50%) translateY(8px); }
+        }
+
+        @keyframes pinPulse {
+            0%, 100% { box-shadow: 0 0 0 6px rgba(201,168,76,0.3); }
+            50%       { box-shadow: 0 0 0 12px rgba(201,168,76,0.1); }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .house-block, .house-block.reverse { grid-template-columns: 1fr; direction: ltr; }
+            .house-block.reverse > * { direction: ltr; }
+            .gallery-main { height: 350px; }
+            .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 3.5rem auto 0; }
+            .price-card.featured { transform: scale(1); }
+            .res-wrapper { grid-template-columns: 1fr; gap: 3rem; }
+            .contact-grid { grid-template-columns: 1fr; }
+            .footer-top { grid-template-columns: 1fr 1fr; }
+            .common-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 72px; left: 0; right: 0; background: rgba(26,46,26,.98); padding: 2rem 5%; gap: 1.5rem; }
+            .nav-links.open { display: flex; }
+            .hamburger { display: flex; }
+            .intro-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .house-features { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .res-form { padding: 2rem 1.5rem; }
+            .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+            .footer-bottom { flex-direction: column; gap: .5rem; text-align: center; }
+            .common-bottom { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+    <a href="#hero" class="nav-logo">Tiny<span>Escape</span></a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#houses">Evler</a></li>
+        <li><a href="#common">Olanaklar</a></li>
+        <li><a href="#pricing">Fiyatlar</a></li>
+        <li><a href="#contact">Konum</a></li>
+        <li><a href="#reservation" class="nav-cta">Rezervasyon</a></li>
+    </ul>
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="hero-badge">Lüks Tiny House Deneyimi</div>
+        <h1 class="hero-title">
+            Doğanın<br>
+            <em>kalbinde</em> huzur.
+        </h1>
+        <p class="hero-sub">İki eşsiz tiny house, sınırsız huzur.<br>Günlük hayatın gürültüsünden uzaklaşın.</p>
+        <a href="#reservation" class="hero-btn">Rezervasyon Yap</a>
+    </div>
+    <div class="hero-scroll">Keşfet</div>
+</section>
+
+<!-- INTRO -->
+<div id="intro">
+    <div class="intro-grid">
+        <div class="intro-item reveal">
+            <div class="intro-icon">🌿</div>
+            <h3>Tam Mahremiyet</h3>
+            <p>Her eve özel bahçe, teras ve giriş. Komşunuz olmadan doğayla baş başa kalın.</p>
+        </div>
+        <div class="intro-item reveal">
+            <div class="intro-icon">✨</div>
+            <h3>Lüks Konfor</h3>
+            <p>Premium yatak, nitelikli mutfak ekipmanı, yüksek hızlı WiFi ve klima.</p>
+        </div>
+        <div class="intro-item reveal">
+            <div class="intro-icon">🏊</div>
+            <h3>Ortak Havuz</h3>
+            <p>Isıtmalı yüzme havuzu, BBQ teras ve bakımlı bahçe her konuğumuza açık.</p>
+        </div>
+    </div>
+</div>
+
+<!-- HOUSES -->
+<section id="houses">
+    <div class="container">
+        <div class="section-header reveal">
+            <div class="section-tag">Tiny House'larımız</div>
+            <h2 class="section-title">İki farklı <em>kaçış</em> noktası.</h2>
+            <div class="section-rule"></div>
+        </div>
+    </div>
+
+    <!-- MALIBU -->
+    <div class="house-block reveal">
+        <div class="house-gallery">
+            <div class="gallery-main">
+                <img id="malibu-main" src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=900&q=85" alt="Malibu Tiny House">
+                <div class="gallery-badge">Malibu</div>
+            </div>
+            <div class="gallery-thumbs">
+                <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=300&q=80" alt="Malibu dış" onclick="switchImg('malibu-main', this.src)">
+                <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=300&q=80" alt="Malibu iç" onclick="switchImg('malibu-main', this.src)">
+                <img src="https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=80" alt="Malibu yatak" onclick="switchImg('malibu-main', this.src)">
+            </div>
+        </div>
+        <div class="house-info">
+            <div class="house-tag">Tiny House No.1</div>
+            <h2 class="house-name">Malibu</h2>
+            <p class="house-subtitle">Modern ahşap, deniz meltemli esintiler</p>
+            <div class="house-rule"></div>
+            <p class="house-desc">
+                Minimal ve modern çizgileriyle Malibu, beyaz meşe dokunuşları ve büyük panoramik pencereleriyle tasarlanmış bir kaçış noktası.
+                Doğu cephesindeki terastan gün doğumunu, akşamları ise yıldızları seyredin.
+                Seramik mutfak tezgahı, duşakabin ve yüksek tavanlı yaşam alanıyla konfor ve estetik bir arada.
+            </p>
+            <div class="house-features">
+                <span class="feature">2 Kişilik Fransız Yatak</span>
+                <span class="feature">Panoramik Teras</span>
+                <span class="feature">Tam Donanımlı Mutfak</span>
+                <span class="feature">Isıtmalı Zemin</span>
+                <span class="feature">Akıllı Ev Sistemi</span>
+                <span class="feature">Yüksek Hızlı WiFi</span>
+                <span class="feature">55" OLED TV</span>
+                <span class="feature">Klima & Isıtma</span>
+            </div>
+            <div class="house-price-row">
+                <div class="house-price">
+                    <span>₺4.500</span><br>
+                    <small>/ gece • 2 kişi dahil</small>
+                </div>
+                <a href="#reservation" class="book-btn">Rezervasyon →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAKARTA -->
+    <div class="house-block reverse reveal">
+        <div class="house-gallery">
+            <div class="gallery-main">
+                <img id="jakarta-main" src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=900&q=85" alt="Jakarta Tiny House">
+                <div class="gallery-badge">Jakarta</div>
+            </div>
+            <div class="gallery-thumbs">
+                <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=300&q=80" alt="Jakarta dış" onclick="switchImg('jakarta-main', this.src)">
+                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=300&q=80" alt="Jakarta iç" onclick="switchImg('jakarta-main', this.src)">
+                <img src="https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&w=300&q=80" alt="Jakarta yatak" onclick="switchImg('jakarta-main', this.src)">
+            </div>
+        </div>
+        <div class="house-info">
+            <div class="house-tag">Tiny House No.2</div>
+            <h2 class="house-name">Jakarta</h2>
+            <p class="house-subtitle">Tropik ruh, bambu dokunuşlar, ormana gömülü</p>
+            <div class="house-rule"></div>
+            <p class="house-desc">
+                Tropikal estetikten ilham alan Jakarta, doğal bambu kirişler, jüt dokuma aksesuarlar ve içeri süzülen yeşil ışıkla
+                sizi orman içine davet ediyor. Asılı hamak verandasından ağaç tepelerini seyrederken kahvenizi yudumlayın.
+                Doğa seslerinin eşliğinde derin bir uyku için özenle seçilmiş organik yatak ve yastık koleksiyonu sizi bekliyor.
+            </p>
+            <div class="house-features">
+                <span class="feature">Bambu Süit Yatak Odası</span>
+                <span class="feature">Hamak Veranda</span>
+                <span class="feature">Açık Hava Duşu</span>
+                <span class="feature">Organik Yatak Takımı</span>
+                <span class="feature">Doğal Taş Banyo</span>
+                <span class="feature">Yüksek Hızlı WiFi</span>
+                <span class="feature">Mini Bar</span>
+                <span class="feature">Klima & Isıtma</span>
+            </div>
+            <div class="house-price-row">
+                <div class="house-price">
+                    <span>₺5.200</span><br>
+                    <small>/ gece • 2 kişi dahil</small>
+                </div>
+                <a href="#reservation" class="book-btn">Rezervasyon →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- POOL & COMMON AREAS -->
+<section id="common">
+    <div class="container">
+        <div class="section-header reveal">
+            <div class="section-tag">Ortak Alanlar</div>
+            <h2 class="section-title">Havuz, bahçe, <em>özgürlük.</em></h2>
+            <div class="section-rule"></div>
+        </div>
+    </div>
+
+    <div style="max-width:1200px; margin:0 auto; padding:0 5%;">
+        <div class="common-grid reveal">
+            <div class="common-img-wrap">
+                <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=900&q=85" alt="Yüzme Havuzu">
+            </div>
+            <div class="common-text-card">
+                <h3>Isıtmalı Yüzme Havuzu</h3>
+                <div style="width:32px;height:1px;background:var(--gold);margin:.8rem 0 1rem;"></div>
+                <p>32 m² geniş havuzumuz tüm yıl boyunca ısıtılmaktadır. Sabah yüzüşü, akşam yıldız altında sürüklenme ya da sadece şezlongda uzanarak kitap okuma... Seçim sizin.</p>
+                <ul class="amenity-list">
+                    <li>Sabah 07:00 – Gece 23:00 arası açık</li>
+                    <li>Isıtmalı havuz (26–28°C sabit)</li>
+                    <li>Havuz başı bar servisi (talep üzerine)</li>
+                    <li>Havlu ve şezlong ikram</li>
+                    <li>Çocuklar için sığ bölme</li>
+                </ul>
+            </div>
+        </div>
+        <div class="common-bottom reveal">
+            <div class="common-img-wrap">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=85" alt="BBQ Alanı">
+            </div>
+            <div class="common-img-wrap">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=85" alt="Bahçe">
+            </div>
+            <div class="common-text-card" style="padding:2rem;">
+                <h3>BBQ & Bahçe</h3>
+                <div style="width:28px;height:1px;background:var(--gold);margin:.6rem 0 .8rem;"></div>
+                <p style="font-size:.83rem;line-height:1.8;color:var(--text-mid);">Profesyonel Weber ızgara, açık hava yemek masası, bahçe oyunları ve gün batımı seyri için özel köşeler.</p>
+                <ul class="amenity-list" style="margin-top:1rem;">
+                    <li>Weber kettle ızgara</li>
+                    <li>8 kişilik açık hava masası</li>
+                    <li>Akşam aydınlatması</li>
+                    <li>Piknik alanı</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+    <div class="container">
+        <div class="section-header reveal">
+            <div class="section-tag">Fiyatlandırma</div>
+            <h2 class="section-title">Şeffaf ve <em>adil</em> fiyatlar.</h2>
+            <div class="section-rule"></div>
+        </div>
+
+        <div class="pricing-grid">
+
+            <div class="price-card reveal">
+                <div class="price-header">
+                    <div class="price-plan">Hafta İçi</div>
+                    <div class="price-name">Malibu</div>
+                    <div class="price-amount">
+                        <span class="currency">₺</span>
+                        <span class="number">4.500</span>
+                        <span class="per"> / gece</span>
+                    </div>
+                </div>
+                <div class="price-body">
+                    <ul class="price-features">
+                        <li><span>✓</span> 2 kişi dahil</li>
+                        <li><span>✓</span> Kahvaltı sepeti</li>
+                        <li><span>✓</span> Havuz & bahçe erişimi</li>
+                        <li><span>✓</span> Ücretsiz otopark</li>
+                        <li><span>✓</span> Çarşaf & havlu</li>
+                        <li><span>✓</span> WiFi</li>
+                    </ul>
+                    <a href="#reservation" class="price-cta">Rezervasyon Yap</a>
+                </div>
+            </div>
+
+            <div class="price-card featured reveal">
+                <div class="price-header">
+                    <div class="price-badge">En Popüler</div>
+                    <div class="price-plan">Hafta Sonu</div>
+                    <div class="price-name">Jakarta</div>
+                    <div class="price-amount">
+                        <span class="currency">₺</span>
+                        <span class="number">6.500</span>
+                        <span class="per"> / gece</span>
+                    </div>
+                </div>
+                <div class="price-body">
+                    <ul class="price-features">
+                        <li><span>✓</span> 2 kişi dahil</li>
+                        <li><span>✓</span> Kahvaltı & akşam aperitif</li>
+                        <li><span>✓</span> Havuz & BBQ erişimi</li>
+                        <li><span>✓</span> Ücretsiz otopark</li>
+                        <li><span>✓</span> Şampanya karşılama</li>
+                        <li><span>✓</span> Early check-in</li>
+                    </ul>
+                    <a href="#reservation" class="price-cta">Rezervasyon Yap</a>
+                </div>
+            </div>
+
+            <div class="price-card reveal">
+                <div class="price-header">
+                    <div class="price-plan">Uzun Konaklama</div>
+                    <div class="price-name">7+ Gece</div>
+                    <div class="price-amount">
+                        <span class="currency">₺</span>
+                        <span class="number">3.800</span>
+                        <span class="per"> / gece</span>
+                    </div>
+                </div>
+                <div class="price-body">
+                    <ul class="price-features">
+                        <li><span>✓</span> Her iki ev uygun</li>
+                        <li><span>✓</span> %15 indirim</li>
+                        <li><span>✓</span> Tüm olanaklar dahil</li>
+                        <li><span>✓</span> Ücretsiz transfer</li>
+                        <li><span>✓</span> Haftalık temizlik</li>
+                        <li><span>✓</span> Esnek iptal hakkı</li>
+                    </ul>
+                    <a href="#reservation" class="price-cta">Rezervasyon Yap</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- RESERVATION -->
+<section id="reservation">
+    <div class="container">
+        <div class="res-wrapper">
+            <div class="res-info reveal">
+                <div class="section-tag">Rezervasyon</div>
+                <h2>Kaçışınızı<br><em>planlayalım.</em></h2>
+                <div style="width:40px;height:1px;background:var(--gold);margin:1.5rem 0;"></div>
+                <p>Formu doldurun, en kısa sürede size geri dönelim. Özel istekleriniz ve sorularınız için doğrudan da ulaşabilirsiniz.</p>
+                <ul class="res-contact-list">
+                    <li>
+                        <span class="icon">📞</span>
+                        <div>
+                            <strong style="font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);">Telefon</strong>
+                            <span style="display:block;font-size:.88rem;color:var(--text-dark);">+90 532 000 00 00</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">✉️</span>
+                        <div>
+                            <strong style="font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);">E-posta</strong>
+                            <span style="display:block;font-size:.88rem;color:var(--text-dark);">info@tinyescape.com.tr</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="icon">📍</span>
+                        <div>
+                            <strong style="font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);">Adres</strong>
+                            <span style="display:block;font-size:.88rem;color:var(--text-dark);">Ormanlık Mah. Doğa Cad. No:12<br>Sapanca, Sakarya</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="res-form reveal">
+                <h3>Rezervasyon Talebi</h3>
+                <form id="resForm" onsubmit="handleReservation(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ad Soyad</label>
+                            <input type="text" placeholder="Adınız Soyadınız" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefon</label>
+                            <input type="tel" placeholder="+90 5XX XXX XX XX" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>E-posta</label>
+                        <input type="email" placeholder="ornek@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ev Seçimi</label>
+                        <select required>
+                            <option value="">— Bir ev seçin —</option>
+                            <option>Malibu (Modern Ahşap)</option>
+                            <option>Jakarta (Tropik Bambu)</option>
+                            <option>Her İkisi (Özel Paket)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Giriş Tarihi</label>
+                            <input type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Çıkış Tarihi</label>
+                            <input type="date" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Misafir Sayısı</label>
+                            <select>
+                                <option>1 Kişi</option>
+                                <option selected>2 Kişi</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nereden Duydunuz?</label>
+                            <select>
+                                <option>Instagram</option>
+                                <option>Google</option>
+                                <option>Tavsiye</option>
+                                <option>Diğer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Özel İstek (Opsiyonel)</label>
+                        <textarea rows="3" placeholder="Özel gün, diyet isteği, erken giriş..."></textarea>
+                    </div>
+                    <button type="submit" class="form-submit">Talep Gönder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT & LOCATION -->
+<section id="contact">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="contact-info reveal">
+                <div class="section-tag">Konum & İletişim</div>
+                <h2>Bizi bulmak<br><em>kolay.</em></h2>
+                <div style="width:40px;height:1px;background:var(--gold);margin:1.5rem 0;"></div>
+                <p>Sapanca Gölü kıyısında, İstanbul'a 90 km mesafede. Huzuru bulmak için çok uzağa gitmenize gerek yok.</p>
+                <div class="contact-cards">
+                    <div class="contact-card">
+                        <div class="contact-card-icon">📍</div>
+                        <div class="contact-card-text">
+                            <strong>Adres</strong>
+                            <span>Ormanlık Mah. Doğa Cad. No:12, Sapanca / Sakarya</span>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-card-icon">📞</div>
+                        <div class="contact-card-text">
+                            <strong>Telefon & WhatsApp</strong>
+                            <span>+90 532 000 00 00</span>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-card-icon">🕐</div>
+                        <div class="contact-card-text">
+                            <strong>Check-in / Check-out</strong>
+                            <span>Giriş 15:00 — Çıkış 11:00</span>
+                        </div>
+                    </div>
+                    <div class="contact-card">
+                        <div class="contact-card-icon">🚗</div>
+                        <div class="contact-card-text">
+                            <strong>Ulaşım</strong>
+                            <span>İstanbul TEM otoyolu — 90 dk</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-placeholder reveal">
+                <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=85" alt="Konum">
+                <div class="map-pin">
+                    <div class="map-pin-dot"></div>
+                    <div class="map-pin-label">TinyEscape — Sapanca</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-top">
+        <div class="footer-brand">
+            <span class="logo">TinyEscape</span>
+            <p>Doğanın kalbinde, lüksün içinde. İki eşsiz tiny house ile hayatın gürültüsünden kaçın.</p>
+            <div class="footer-socials">
+                <a href="#" class="soc-btn">IG</a>
+                <a href="#" class="soc-btn">FB</a>
+                <a href="#" class="soc-btn">TW</a>
+                <a href="#" class="soc-btn">YT</a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Evler</h4>
+            <ul>
+                <li><a href="#houses">Malibu</a></li>
+                <li><a href="#houses">Jakarta</a></li>
+                <li><a href="#common">Ortak Alanlar</a></li>
+                <li><a href="#pricing">Fiyatlar</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Bilgi</h4>
+            <ul>
+                <li><a href="#">İptal Politikası</a></li>
+                <li><a href="#">SSS</a></li>
+                <li><a href="#">Ev Kuralları</a></li>
+                <li><a href="#">Gizlilik</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>İletişim</h4>
+            <ul>
+                <li><a href="#">+90 532 000 00 00</a></li>
+                <li><a href="#">info@tinyescape.com.tr</a></li>
+                <li><a href="#">Sapanca, Sakarya</a></li>
+                <li><a href="#reservation">Rezervasyon →</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 TinyEscape. Tüm hakları saklıdır.</p>
+        <p>Tasarım & Geliştirme — TinyEscape Studio</p>
+    </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    ✓ Rezervasyon talebiniz alındı! En kısa sürede sizinle iletişime geçeceğiz.
+</div>
+
+<script>
+    // Hero bg loaded
+    const heroBg = document.getElementById('heroBg');
+    const img = new Image();
+    img.onload = () => heroBg.classList.add('loaded');
+    img.src = 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=1920&q=90';
+
+    // Navbar scroll
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Hamburger
+    function toggleMenu() {
+        document.getElementById('navLinks').classList.toggle('open');
+    }
+    document.querySelectorAll('.nav-links a').forEach(a =>
+        a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'))
+    );
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => entry.target.classList.add('visible'), i * 100);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Gallery thumb switcher
+    function switchImg(id, src) {
+        const big = src.replace('w=300', 'w=900');
+        document.getElementById(id).src = big;
+    }
+
+    // Price CTA → scroll to reservation
+    document.querySelectorAll('.price-cta').forEach(btn => {
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            document.getElementById('reservation').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Reservation form
+    function handleReservation(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('.form-submit');
+        btn.textContent = 'Gönderiliyor...';
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.textContent = 'Talep Gönder';
+            btn.disabled = false;
+            e.target.reset();
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 5000);
+        }, 1400);
+    }
+
+    // Set date min = today
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(d => d.min = today);
+</script>
+</body>
+</html>
