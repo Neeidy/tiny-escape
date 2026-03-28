@@ -1343,15 +1343,17 @@
 
         .avail-house-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: var(--cream);
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: var(--gold-light);
             line-height: 1;
+            letter-spacing: .5px;
         }
 
         .avail-house-sub {
-            font-size: .75rem;
-            color: rgba(245,240,232,.45);
+            font-size: .78rem;
+            color: rgba(245,240,232,.5);
+            margin-top: .1rem;
         }
 
         .avail-status {
@@ -2036,17 +2038,17 @@
                 <p>Takvimde yeşil günler her iki ev için de müsaittir. Sarı günler dolu tarihleri gösterir. Tarihinizi seçip aşağıdan rezervasyon talebinizi iletebilirsiniz.</p>
                 <div class="avail-houses">
                     <div class="avail-house-row">
-                        <div class="avail-house-name">🏡 Malibu</div>
+                        <div class="avail-house-name">Malibu</div>
                         <div class="avail-house-sub">Modern ahşap • 2 kişi • ₺4.500/gece</div>
-                        <div class="avail-status free">Müsait</div>
+                        <div class="avail-status free" id="malibu-status">Müsait</div>
                     </div>
                     <div class="avail-house-row">
-                        <div class="avail-house-name">🌿 Jakarta</div>
+                        <div class="avail-house-name">Jakarta</div>
                         <div class="avail-house-sub">Tropik bambu • 2 kişi • ₺5.200/gece</div>
-                        <div class="avail-status busy">5–8 Haz. Dolu</div>
+                        <div class="avail-status busy" id="jakarta-status">5–8 Haz. Dolu</div>
                     </div>
                 </div>
-                <a href="#reservation" class="hero-btn" style="display:inline-block;">Rezervasyon Yap →</a>
+                <a href="#reservation" id="avail-res-btn" class="hero-btn" style="display:inline-block;">Rezervasyon Yap →</a>
             </div>
         </div>
     </div>
@@ -2271,20 +2273,55 @@
 
     // Takvim
     const MONTHS_TR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
-    const BOOKED_DAYS = [5, 6, 7, 8, 14, 15]; // dolu günler (demo)
+
+    // Her ev için dolu günler: { ay(0-bazlı): [günler] }
+    const BOOKED = {
+        malibu:  { 5: [12, 13, 14, 20, 21] },       // Haziran
+        jakarta: { 5: [5, 6, 7, 8, 25, 26, 27] }    // Haziran
+    };
+
     let calDate = new Date();
     calDate.setDate(1);
+    let selectedDay = null;
+
+    function isBooked(house, month, day) {
+        return (BOOKED[house][month] || []).includes(day);
+    }
+
+    function updateStatus(day) {
+        const month = calDate.getMonth();
+        const malibuEl  = document.getElementById('malibu-status');
+        const jakartaEl = document.getElementById('jakarta-status');
+
+        if (day === null) {
+            malibuEl.className  = 'avail-status free';  malibuEl.textContent  = 'Müsait';
+            jakartaEl.className = 'avail-status busy';  jakartaEl.textContent = '5–8 Haz. Dolu';
+            return;
+        }
+
+        if (isBooked('malibu', month, day)) {
+            malibuEl.className = 'avail-status busy'; malibuEl.textContent = 'Bu tarih dolu';
+        } else {
+            malibuEl.className = 'avail-status free'; malibuEl.textContent = 'Müsait';
+        }
+
+        if (isBooked('jakarta', month, day)) {
+            jakartaEl.className = 'avail-status busy'; jakartaEl.textContent = 'Bu tarih dolu';
+        } else {
+            jakartaEl.className = 'avail-status free'; jakartaEl.textContent = 'Müsait';
+        }
+    }
 
     function renderCalendar() {
-        const year = calDate.getFullYear();
+        const year  = calDate.getFullYear();
         const month = calDate.getMonth();
         document.getElementById('calMonthLabel').textContent = MONTHS_TR[month] + ' ' + year;
 
-        const firstDay = (new Date(year, month, 1).getDay() + 6) % 7; // Pazartesi=0
+        const firstDay    = (new Date(year, month, 1).getDay() + 6) % 7;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const todayDate = new Date();
-        const grid = document.getElementById('calGrid');
-        grid.innerHTML = '';
+        const todayDate   = new Date();
+        const grid        = document.getElementById('calGrid');
+        grid.innerHTML    = '';
 
         for (let i = 0; i < firstDay; i++) {
             const el = document.createElement('div');
@@ -2293,20 +2330,23 @@
         }
 
         for (let d = 1; d <= daysInMonth; d++) {
-            const el = document.createElement('div');
-            const isPast = new Date(year, month, d) < new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+            const el      = document.createElement('div');
+            const isPast  = new Date(year, month, d) < new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
             const isToday = d === todayDate.getDate() && month === todayDate.getMonth() && year === todayDate.getFullYear();
-            const isBooked = BOOKED_DAYS.includes(d) && month === calDate.getMonth();
+            const bookedBoth = isBooked('malibu', month, d) && isBooked('jakarta', month, d);
 
             el.textContent = d;
-            if (isToday) el.className = 'cal-day today';
-            else if (isPast) el.className = 'cal-day past';
-            else if (isBooked) el.className = 'cal-day booked';
+
+            if (isToday)      el.className = 'cal-day today';
+            else if (isPast)  el.className = 'cal-day past';
+            else if (bookedBoth) el.className = 'cal-day booked';
             else {
-                el.className = 'cal-day available';
+                el.className = d === selectedDay ? 'cal-day available selected' : 'cal-day available';
                 el.addEventListener('click', () => {
                     grid.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
                     el.classList.add('selected');
+                    selectedDay = d;
+                    updateStatus(d);
                 });
             }
             grid.appendChild(el);
@@ -2315,8 +2355,24 @@
 
     function changeMonth(dir) {
         calDate.setMonth(calDate.getMonth() + dir);
+        selectedDay = null;
+        updateStatus(null);
         renderCalendar();
     }
+
+    // Rezervasyon butonuna tıklayınca seçilen tarihi forma aktar
+    document.getElementById('avail-res-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (selectedDay !== null) {
+            const year  = calDate.getFullYear();
+            const month = String(calDate.getMonth() + 1).padStart(2, '0');
+            const day   = String(selectedDay).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            const checkin = document.querySelector('#resForm input[type="date"]');
+            if (checkin) checkin.value = dateStr;
+        }
+        document.getElementById('reservation').scrollIntoView({ behavior: 'smooth' });
+    });
 
     renderCalendar();
 </script>
