@@ -1319,34 +1319,48 @@
             margin-bottom: 2rem;
         }
 
-        .avail-houses { display: flex; flex-direction: column; gap: 1rem; }
+        .avail-houses {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
 
         .avail-house-row {
             background: rgba(255,255,255,.06);
             border: 1px solid rgba(255,255,255,.1);
-            border-radius: 6px;
-            padding: 1rem 1.2rem;
-            display: flex; align-items: center; justify-content: space-between;
+            border-radius: 8px;
+            padding: 1.4rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+            transition: border-color .3s;
+        }
+
+        .avail-house-row:hover {
+            border-color: rgba(201,168,76,.4);
         }
 
         .avail-house-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 500;
             color: var(--cream);
+            line-height: 1;
         }
 
         .avail-house-sub {
             font-size: .75rem;
             color: rgba(245,240,232,.45);
-            margin-top: .15rem;
         }
 
         .avail-status {
-            display: flex; align-items: center; gap: .5rem;
-            font-size: .75rem;
-            font-weight: 600;
+            display: inline-flex; align-items: center; gap: .45rem;
+            font-size: .72rem;
+            font-weight: 700;
             letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: .2rem;
         }
 
         .avail-status.free { color: #86efac; }
@@ -1354,11 +1368,12 @@
 
         .avail-status::before {
             content: '';
-            width: 8px; height: 8px;
+            width: 7px; height: 7px;
             border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        .avail-status.free::before { background: #22c55e; }
+        .avail-status.free::before { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
         .avail-status.busy::before { background: #ef4444; }
 
         /* ── INSTAGRAM FEED ── */
@@ -1437,6 +1452,7 @@
             .why-grid { grid-template-columns: 1fr 1fr; }
             .reviews-grid { grid-template-columns: 1fr; max-width: 480px; margin: 3.5rem auto 0; }
             .avail-wrapper { grid-template-columns: 1fr; }
+            .avail-houses { grid-template-columns: 1fr 1fr; }
             .insta-grid { grid-template-columns: repeat(3,1fr); }
         }
 
@@ -1473,6 +1489,7 @@
             .footer-top { grid-template-columns: 1fr; gap: 2rem; }
             .footer-bottom { flex-direction: column; gap: .5rem; text-align: center; }
             .common-bottom { grid-template-columns: 1fr; }
+            .avail-houses { grid-template-columns: 1fr !important; }
         }
     </style>
 </head>
@@ -2016,24 +2033,20 @@
             <div class="avail-info reveal">
                 <h3>Anlık müsaitlik durumu</h3>
                 <div></div>
-                <p>Takvimde yeşil günler her iki ev için de müsaittir. Sarı günler dolu tarihleri gösterir. Tarihinizi seçtikten sonra rezervasyon formundan talebinizi iletebilirsiniz.</p>
+                <p>Takvimde yeşil günler her iki ev için de müsaittir. Sarı günler dolu tarihleri gösterir. Tarihinizi seçip aşağıdan rezervasyon talebinizi iletebilirsiniz.</p>
                 <div class="avail-houses">
                     <div class="avail-house-row">
-                        <div>
-                            <div class="avail-house-name">Malibu</div>
-                            <div class="avail-house-sub">Modern ahşap • 2 kişi</div>
-                        </div>
+                        <div class="avail-house-name">🏡 Malibu</div>
+                        <div class="avail-house-sub">Modern ahşap • 2 kişi • ₺4.500/gece</div>
                         <div class="avail-status free">Müsait</div>
                     </div>
                     <div class="avail-house-row">
-                        <div>
-                            <div class="avail-house-name">Jakarta</div>
-                            <div class="avail-house-sub">Tropik bambu • 2 kişi</div>
-                        </div>
+                        <div class="avail-house-name">🌿 Jakarta</div>
+                        <div class="avail-house-sub">Tropik bambu • 2 kişi • ₺5.200/gece</div>
                         <div class="avail-status busy">5–8 Haz. Dolu</div>
                     </div>
                 </div>
-                <a href="#reservation" class="hero-btn" style="margin-top:2rem;display:inline-block;">Rezervasyon Yap →</a>
+                <a href="#reservation" class="hero-btn" style="display:inline-block;">Rezervasyon Yap →</a>
             </div>
         </div>
     </div>
