@@ -1302,7 +1302,11 @@
         .ld-booked    { background: rgba(201,168,76,0.4); }
         .ld-today     { background: var(--green-dark); }
 
-        .avail-info { color: var(--cream); }
+        .avail-info {
+            color: var(--cream);
+            display: flex;
+            flex-direction: column;
+        }
 
         .avail-info h3 {
             font-size: 1.8rem;
@@ -1316,7 +1320,7 @@
             font-size: .88rem;
             color: rgba(245,240,232,.65);
             line-height: 1.85;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .avail-houses {
@@ -1333,7 +1337,7 @@
             padding: 1.4rem 1.2rem;
             display: flex;
             flex-direction: column;
-            gap: .6rem;
+            gap: .5rem;
             transition: border-color .3s;
         }
 
@@ -1343,17 +1347,17 @@
 
         .avail-house-name {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 1.7rem;
-            font-weight: 600;
+            font-size: 2rem;
+            font-weight: 700;
             color: var(--gold-light);
             line-height: 1;
             letter-spacing: .5px;
+            order: -1;
         }
 
         .avail-house-sub {
             font-size: .78rem;
             color: rgba(245,240,232,.5);
-            margin-top: .1rem;
         }
 
         .avail-status {
@@ -2048,7 +2052,7 @@
                         <div class="avail-status busy" id="jakarta-status">5–8 Haz. Dolu</div>
                     </div>
                 </div>
-                <a href="#reservation" id="avail-res-btn" class="hero-btn" style="display:inline-block;">Rezervasyon Yap →</a>
+                <a href="#reservation" id="avail-res-btn" class="hero-btn" style="display:inline-block;margin-top:1.5rem;align-self:flex-start;">Rezervasyon Yap →</a>
             </div>
         </div>
     </div>
